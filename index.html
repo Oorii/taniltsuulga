@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Оргих — Веб Дизайнер</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Unbounded:wght@200;300;400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --ink: #0a0a08;
+    --paper: #f2ede6;
+    --accent: #c8a96e;
+    --muted: #8a8478;
+    --light: #e8e2d8;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'DM Sans', sans-serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    position: fixed;
+    width: 8px; height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.1s;
+    mix-blend-mode: difference;
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 36px; height: 36px;
+    border: 1px solid rgba(200,169,110,0.5);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transition: transform 0.25s ease, width 0.3s, height 0.3s;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 28px 48px;
+    mix-blend-mode: normal;
+  }
+  .nav-logo {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 700; font-size: 13px;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+  .nav-links { display: flex; gap: 40px; }
+  .nav-links a {
+    font-size: 12px; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--muted);
+    text-decoration: none;
+    transition: color 0.3s;
+    position: relative;
+  }
+  .nav-links a::after {
+    content: '';
+    position: absolute; bottom: -3px; left: 0;
+    width: 0; height: 1px;
+    background: var(--accent);
+    transition: width 0.3s;
+  }
+  .nav-links a:hover { color: var(--paper); }
+  .nav-links a:hover::after { width: 100%; }
+
+  /* ─── HERO ─── */
+  .hero {
+    height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-left {
+    display: flex; flex-direction: column;
+    justify-content: flex-end;
+    padding: 0 48px 72px 48px;
+    position: relative; z-index: 2;
+  }
+
+  .hero-tag {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 10px; font-weight: 300;
+    letter-spacing: 0.25em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.3s forwards;
+  }
+
+  .hero-name {
+    font-family: 'Unbounded', sans-serif;
+    font-size: clamp(52px, 7vw, 96px);
+    font-weight: 900;
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    color: var(--paper);
+    opacity: 0;
+    animation: fadeUp 0.9s 0.5s forwards;
+  }
+
+  .hero-name em {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--accent);
+  }
+
+  .hero-roles {
+    margin-top: 32px;
+    display: flex; flex-direction: column; gap: 6px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.7s forwards;
+  }
+  .hero-roles span {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px; font-weight: 300;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-transform: uppercase;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .hero-roles span::before {
+    content: '';
+    display: block; width: 28px; height: 1px;
+    background: var(--accent);
+  }
+
+  .hero-cta {
+    margin-top: 56px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.9s forwards;
+  }
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 16px 32px;
+    background: transparent;
+    border: 1px solid rgba(200,169,110,0.4);
+    color: var(--paper);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px; letter-spacing: 0.15em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: all 0.4s;
+    cursor: none;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-primary::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: var(--accent);
+    transform: translateX(-101%);
+    transition: transform 0.4s cubic-bezier(0.76,0,0.24,1);
+    z-index: -1;
+  }
+  .btn-primary:hover { color: var(--ink); border-color: var(--accent); }
+  .btn-primary:hover::before { transform: translateX(0); }
+  .arrow { font-size: 16px; transition: transform 0.3s; }
+  .btn-primary:hover .arrow { transform: translateX(4px); }
+
+  /* Hero Right — Photo area */
+  .hero-right {
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-img-wrap {
+    position: absolute; inset: 0;
+    opacity: 0;
+    animation: fadeIn 1.2s 0.4s forwards;
+  }
+  .hero-img-wrap img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    filter: grayscale(20%) contrast(1.05);
+  }
+  .hero-img-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to right, var(--ink) 0%, transparent 30%),
+                linear-gradient(to top, var(--ink) 0%, transparent 40%);
+  }
+
+  /* Floating number */
+  .hero-number {
+    position: absolute;
+    bottom: 72px; right: 48px;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 10px; font-weight: 200;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    writing-mode: vertical-rl;
+    opacity: 0;
+    animation: fadeIn 1s 1.2s forwards;
+  }
+
+  /* Scroll indicator */
+  .scroll-hint {
+    position: absolute;
+    bottom: 36px; left: 50%;
+    transform: translateX(-50%);
+    display: flex; flex-direction: column;
+    align-items: center; gap: 8px;
+    opacity: 0;
+    animation: fadeIn 1s 1.5s forwards;
+  }
+  .scroll-line {
+    width: 1px; height: 48px;
+    background: linear-gradient(to bottom, var(--accent), transparent);
+    animation: scrollPulse 2s infinite;
+  }
+  .scroll-text {
+    font-size: 9px; letter-spacing: 0.2em;
+    color: var(--muted); text-transform: uppercase;
+  }
+
+  /* ─── MARQUEE ─── */
+  .marquee-wrap {
+    overflow: hidden;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding: 18px 0;
+    background: rgba(200,169,110,0.04);
+  }
+  .marquee-track {
+    display: flex; gap: 0;
+    animation: marquee 20s linear infinite;
+    white-space: nowrap;
+  }
+  .marquee-item {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 11px; font-weight: 200;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 0 40px;
+  }
+  .marquee-dot {
+    color: var(--accent); font-size: 16px;
+    vertical-align: middle;
+  }
+
+  /* ─── ABOUT ─── */
+  .section-about {
+    padding: 120px 48px;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 80px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .section-label {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 10px; font-weight: 300;
+    letter-spacing: 0.3em;
+    color: var(--accent);
+    text-transform: uppercase;
+    padding-top: 8px;
+  }
+  .about-text {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(24px, 3vw, 36px);
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--paper);
+  }
+  .about-text strong {
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .about-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    margin-top: 64px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    padding-top: 40px;
+  }
+  .stat {
+    padding-right: 32px;
+  }
+  .stat-num {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 42px; font-weight: 700;
+    color: var(--paper);
+    line-height: 1;
+  }
+  .stat-num span { color: var(--accent); }
+  .stat-label {
+    font-size: 12px; color: var(--muted);
+    letter-spacing: 0.08em;
+    margin-top: 8px;
+  }
+
+  /* ─── WORK ─── */
+  .section-work {
+    padding: 80px 48px 120px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .work-header {
+    display: flex; justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 56px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    padding-bottom: 32px;
+  }
+  .work-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: clamp(32px, 5vw, 64px);
+    font-weight: 700;
+    line-height: 1;
+    color: var(--paper);
+  }
+  .work-count {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .projects-list { display: flex; flex-direction: column; }
+  .project-row {
+    display: grid;
+    grid-template-columns: 60px 1fr 160px 100px;
+    gap: 32px;
+    align-items: center;
+    padding: 28px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    cursor: none;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .project-row::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: rgba(200,169,110,0.04);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s cubic-bezier(0.76,0,0.24,1);
+  }
+  .project-row:hover::before { transform: scaleX(1); }
+  .project-row:hover .proj-num { color: var(--accent); }
+  .project-row:hover .proj-name { letter-spacing: 0.02em; }
+  .proj-num {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 11px; font-weight: 200;
+    color: var(--muted);
+    transition: color 0.3s;
+  }
+  .proj-name {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 20px; font-weight: 400;
+    color: var(--paper);
+    transition: letter-spacing 0.3s;
+  }
+  .proj-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+  .proj-tag {
+    font-size: 10px; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--muted);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 4px 10px; border-radius: 2px;
+  }
+  .proj-year {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 11px; font-weight: 200;
+    color: var(--muted);
+    text-align: right;
+  }
+
+  /* ─── CONTACT ─── */
+  .section-contact {
+    padding: 120px 48px;
+    text-align: center;
+    background: var(--paper);
+    color: var(--ink);
+    position: relative;
+    overflow: hidden;
+  }
+  .contact-bg {
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+      0deg, transparent, transparent 60px,
+      rgba(0,0,0,0.03) 60px, rgba(0,0,0,0.03) 61px
+    );
+  }
+  .contact-inner { position: relative; z-index: 1; }
+  .contact-label {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 10px; font-weight: 300;
+    letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 24px;
+  }
+  .contact-headline {
+    font-family: 'Unbounded', sans-serif;
+    font-size: clamp(36px, 7vw, 96px);
+    font-weight: 900;
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    color: var(--ink);
+    margin-bottom: 48px;
+  }
+  .contact-headline em {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--accent);
+  }
+  .contact-email {
+    display: inline-block;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px; letter-spacing: 0.1em;
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 2px;
+    transition: color 0.3s, border-color 0.3s;
+  }
+  .contact-email:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* ─── FOOTER ─── */
+  footer {
+    background: var(--ink);
+    padding: 32px 48px;
+    display: flex; justify-content: space-between; align-items: center;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .footer-copy {
+    font-size: 11px; color: var(--muted);
+    letter-spacing: 0.08em;
+  }
+  .social-links { display: flex; gap: 24px; }
+  .social-links a {
+    font-size: 11px; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--muted);
+    text-decoration: none;
+    transition: color 0.3s;
+    cursor: none;
+  }
+  .social-links a:hover { color: var(--accent); }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 768px) {
+    nav { padding: 20px 24px; }
+    .nav-links { display: none; }
+    .hero { grid-template-columns: 1fr; }
+    .hero-right { display: none; }
+    .hero-left { padding: 0 24px 56px; }
+    .section-about { grid-template-columns: 1fr; gap: 32px; padding: 80px 24px; }
+    .section-work { padding: 60px 24px; }
+    .project-row { grid-template-columns: 40px 1fr; }
+    .proj-tags, .proj-year { display: none; }
+    .section-contact { padding: 80px 24px; }
+    footer { flex-direction: column; gap: 16px; text-align: center; padding: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Оргих</div>
+  <div class="nav-links">
+    <a href="#about">Тухай</a>
+    <a href="#work">Бүтээлүүд</a>
+    <a href="#contact">Холбоо барих</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-tag">Гитар тоглодог · Мэргэжлийн тамирчин</div>
+    <h1 class="hero-name">
+      Ор<em>гих</em>
+    </h1>
+    <div class="hero-roles">
+      <span>16nastai</span>
+      <span>shildeg surguuliin 10b angiin suragch</span>
+      <span>Ml toglodog</span>
+    </div>
+    <div class="hero-cta">
+      <a href="#work" class="btn-primary">
+        Бүтээлүүд үзэх <span class="arrow">→</span>
+      </a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-img-wrap">
+      <!-- Placeholder: gradient instead of real photo -->
+      <div style="width:100%;height:100%;background:linear-gradient(135deg,#1a1a16 0%,#2d2920 40%,#1a1a16 100%);"></div>
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+        <div style="width:220px;height:280px;border:1px solid rgba(200,169,110,0.2);position:relative;">
+          <div style="position:absolute;top:-1px;left:20px;width:60px;height:1px;background:var(--accent);"></div>
+          <div style="position:absolute;bottom:-1px;right:20px;width:60px;height:1px;background:var(--accent);"></div>
+          <div style="position:absolute;inset:24px;border:1px solid rgba(200,169,110,0.08);display:flex;align-items:center;justify-content:center;">
+            <span style="font-family:'Unbounded',sans-serif;font-size:72px;font-weight:900;color:rgba(200,169,110,0.15);line-height:1;">О</span>
+          </div>
+        </div>
+      </div>
+      <div class="hero-img-overlay"></div>
+    </div>
+  </div>
+  <div class="hero-number">2025 — Улаанбаатар</div>
+  <div class="scroll-hint">
+    <div class="scroll-line"></div>
+    <span class="scroll-text">Доош гүй</span>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span class="marquee-item">nisdeg <span class="marquee-dot">·</span></span>
+    <span class="marquee-item">AI engineer bolno <span class="marquee-dot">·</span></span>
+    <span class="marquee-item">sportlog <span class="marquee-dot">·</span></span>
+    <span class="marquee-item">hool hiideg<span class="marquee-dot">·</span></span>
+    <span class="marquee-item">hsk 2leveltei <span class="marquee-dot">·</span></span>
+    
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section class="section-about" id="about">
+  <div class="section-label">Тухай</div>
+  <div>
+    <p class="about-text">
+      Би <strong>Оргих</strong> — 8-13nasnii huuhduuded <strong>гоо зүй</strong> ба <strong>функциональ байдлыг</strong> нэгтгэн хэрэглэгчийн туршлагыг дахин тодорхойлдог веб дизайнер.
+    </p>
+    <div class="about-stats">
+      <div class="stat">
+        <div class="stat-num">7<span>+</span></div>
+        <div class="stat-label">Жилийн туршлага</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">48<span>+</span></div>
+        <div class="stat-label">Гүйцэтгэсэн төсөл</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">23<span>+</span></div>
+        <div class="stat-label">Байнгын үйлчлүүлэгч</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WORK -->
+<section class="section-work" id="work">
+  <div class="work-header">
+    <div class="work-title">Сонгосон<br>Бүтээлүүд</div>
+    <div class="work-count">Нийт 48 бүтээлийн цуглуулгаас</div>
+  </div>
+  <div class="projects-list">
+    <div class="project-row">
+      <span class="proj-num">01</span>
+      <span class="proj-name">Нүүдэлчин Брэнд Системс</span>
+      <div class="proj-tags">
+        <span class="proj-tag">Брэнд</span>
+        <span class="proj-tag">Вэб</span>
+      </div>
+      <span class="proj-year">2024</span>
+    </div>
+    <div class="project-row">
+      <span class="proj-num">02</span>
+      <span class="proj-name">Тэнгэр Финтек Платформ</span>
+      <div class="proj-tags">
+        <span class="proj-tag">UI/UX</span>
+        <span class="proj-tag">Апп</span>
+      </div>
+      <span class="proj-year">2024</span>
+    </div>
+    <div class="project-row">
+      <span class="proj-num">03</span>
+      <span class="proj-name">Говь Лакшери Э-Коммерс</span>
+      <div class="proj-tags">
+        <span class="proj-tag">Дизайн</span>
+        <span class="proj-tag">Дэлгүүр</span>
+      </div>
+      <span class="proj-year">2023</span>
+    </div>
+    <div class="project-row">
+      <span class="proj-num">04</span>
+      <span class="proj-name">Алтан Гадас Медиа Хауз</span>
+      <div class="proj-tags">
+        <span class="proj-tag">Арт Дирекшн</span>
+      </div>
+      <span class="proj-year">2023</span>
+    </div>
+    <div class="project-row">
+      <span class="proj-num">05</span>
+      <span class="proj-name">Хангай Эко Айдентити</span>
+      <div class="proj-tags">
+        <span class="proj-tag">Брэнд</span>
+        <span class="proj-tag">Хэвлэл</span>
+      </div>
+      <span class="proj-year">2022</span>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="section-contact" id="contact">
+  <div class="contact-bg"></div>
+  <div class="contact-inner">
+    <div class="contact-label">Хамтран ажиллацгаая</div>
+    <h2 class="contact-headline">
+      Шинэ<br><em>Санаа</em><br>бий юу?
+    </h2>
+    <a href="mailto:orgikh@design.mn" class="contact-email">orgikh@design.mn</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span class="footer-copy">© 2025 Оргих — Бүх эрх хуулиар хамгаалагдсан</span>
+  <div class="social-links">
+    <a href="#">Twitter</a>
+    <a href="#">LinkedIn</a>
+    <a href="#">Instagram</a>
+    <a href="#">Behance</a>
+  </div>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx - 4 + 'px';
+    cursor.style.top = my - 4 + 'px';
+  });
+  function animRing() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx - 18 + 'px';
+    ring.style.top = ry - 18 + 'px';
+    requestAnimationFrame(animRing);
+  }
+  animRing();
+
+  // Hover effects on interactive elements
+  document.querySelectorAll('a, .project-row, .btn-primary').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.transform = 'scale(2)';
+      ring.style.width = '56px'; ring.style.height = '56px';
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.style.transform = 'scale(1)';
+      ring.style.width = '36px'; ring.style.height = '36px';
+    });
+  });
+
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.project-row, .stat, .about-text').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(20px)';
+    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>
